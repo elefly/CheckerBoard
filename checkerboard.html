@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Checker Board</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <script src="js/three.min.js"></script>
+    <script>
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //parameters
+        var squareSize = 8;
+        var rows = 9;
+        var cols = 16;
+
+        // Geometry
+        var cbgeometry = new THREE.PlaneGeometry(squareSize * cols, squareSize * rows, cols, rows);
+
+        // Materials
+        var cbmaterials = [];
+
+        cbmaterials.push(new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
+        cbmaterials.push(new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }));
+
+        //var l = cbgeometry.faces.length / 2; // <-- Right here. This should still be 8x8 (64)
+
+        //console.log("This should be 64: " + l);// Just for debugging puporses, make sure this is 64
+
+        for (var i = 0; i < rows; i++)
+        {
+            for (var j = 0; j < cols; j++)
+            {
+                n = (i * cols + j) * 2; // <-- Added this back so we can do every other 'face'
+                cbgeometry.faces[n].materialIndex = (i % 2 + j) % 2;
+                cbgeometry.faces[n + 1].materialIndex = (i % 2 + j) % 2; // Add this line in, the material index should stay the same, we're just doing the other half of the same face
+            }
+        }
+            
+        // Mesh
+        cb = new THREE.Mesh(cbgeometry, new THREE.MeshFaceMaterial(cbmaterials));
+        scene.add(cb);
+
+        camera.position.z = 100;
+
+        var render = function () {
+            requestAnimationFrame(render);
+            cb.rotation.x += 0.01;
+            cb.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        };
+
+        render();
+    </script>
+</body>
+</html>
